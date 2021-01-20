@@ -51,14 +51,16 @@ router.post('/login', (req, res) => {
     console.log(req.body);
     console.log(foundUser);
 
+    if (!foundUser) {
+      return res.redirect('/users/login');
+    }
+
     bcrypt.compare(req.body.password, foundUser.password, (err, result) => {
       if (err) return console.log(err);
 
       if (result) {
         // console.log('Password matched!');
-
         req.session.currentUser = foundUser;
-
         res.redirect('/users/account-page');
       } else {
         res.redirect('/users/login');
@@ -83,7 +85,13 @@ router.post('/login', (req, res) => {
 ///////////////////////////////////////////////////////
 // HANDLES LOGGING OUT
 router.get('/logout', (req, res) => {
-  res.redirect('/');
+  console.log('hit /logout route');
+
+  req.session.destroy((err) => {
+    if (err) return console.log(err);
+    
+    res.redirect('/');
+  })
 });
 
 
@@ -101,7 +109,8 @@ router.get('/account-page', (req, res) => {
     // console.log(req.session);
 
     const context = {
-      currentUser: foundUser
+      currentUser: foundUser,
+      loggedInUser: req.session.currentUser
     }
   
     res.render('users/accountPage', context);

@@ -32,7 +32,14 @@ app.get('/items', (req, res) => {
 
 
 app.get('/', (req, res) => {
-  res.render('home');
+  // If user is logged in take them to account page
+  if (req.session.currentUser) {
+    res.redirect('/users/account-page');
+  } else {
+    res.render('home');
+  }
+  // If not logged take them to home page
+
 });
 
 
